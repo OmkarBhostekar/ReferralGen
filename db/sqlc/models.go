@@ -20,7 +20,7 @@ type Template struct {
 
 type User struct {
 	ID                int64     `json:"id"`
-	Username          string    `json:"username"`
+	Fullname          string    `json:"fullname"`
 	HashedPassword    string    `json:"hashed_password"`
 	Email             string    `json:"email"`
 	CreatedAt         time.Time `json:"created_at"`

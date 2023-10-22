@@ -17,7 +17,6 @@ type Querier interface {
 	GetTemplatesByUser(ctx context.Context, userID int64) ([]Template, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
-	GetUserByUsername(ctx context.Context, username string) (User, error)
 	UpdateTemplateById(ctx context.Context, arg UpdateTemplateByIdParams) (Template, error)
 }
 

@@ -11,28 +11,28 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(
-    username,
-    hashed_password,
-    email
+    fullname,
+    email,
+    hashed_password
 ) VALUES (
     $1,
     $2,
     $3
-) RETURNING id, username, hashed_password, email, created_at, password_changed_at
+) RETURNING id, fullname, hashed_password, email, created_at, password_changed_at
 `
 
 type CreateUserParams struct {
-	Username       string `json:"username"`
-	HashedPassword string `json:"hashed_password"`
+	Fullname       string `json:"fullname"`
 	Email          string `json:"email"`
+	HashedPassword string `json:"hashed_password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.HashedPassword, arg.Email)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Fullname, arg.Email, arg.HashedPassword)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Fullname,
 		&i.HashedPassword,
 		&i.Email,
 		&i.CreatedAt,
@@ -42,7 +42,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, hashed_password, email, created_at, password_changed_at FROM users WHERE email = $1
+SELECT id, fullname, hashed_password, email, created_at, password_changed_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -50,7 +50,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Fullname,
 		&i.HashedPassword,
 		&i.Email,
 		&i.CreatedAt,
@@ -60,7 +60,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, hashed_password, email, created_at, password_changed_at FROM users WHERE id = $1
+SELECT id, fullname, hashed_password, email, created_at, password_changed_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
@@ -68,25 +68,7 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
-		&i.HashedPassword,
-		&i.Email,
-		&i.CreatedAt,
-		&i.PasswordChangedAt,
-	)
-	return i, err
-}
-
-const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, hashed_password, email, created_at, password_changed_at FROM users WHERE username = $1
-`
-
-func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
+		&i.Fullname,
 		&i.HashedPassword,
 		&i.Email,
 		&i.CreatedAt,

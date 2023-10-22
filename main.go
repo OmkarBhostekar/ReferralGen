@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 
+	"example.com/referralgen/api"
+	db "example.com/referralgen/db/sqlc"
 	"example.com/referralgen/util"
 	_ "github.com/lib/pq"
 )
@@ -20,11 +22,11 @@ func main() {
 
 	log.Printf("connected to db: %v", conn)
 
-	// store := db.NewStore(conn)
-	// server, err := api.NewServer(config, store)
+	store := db.NewStore(conn)
+	server, err := api.NewServer(config, store)
 
-	// er := server.Start(config.ServerAddress)
-	// if er != nil {
-	// 	log.Fatal("cannot start server: ", er)
-	// }
+	er := server.Start(config.ServerAddress)
+	if er != nil {
+		log.Fatal("cannot start server: ", er)
+	}
 }

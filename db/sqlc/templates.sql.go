@@ -7,7 +7,6 @@ package referralgen
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/lib/pq"
 )
@@ -27,10 +26,10 @@ INSERT INTO templates(
 `
 
 type CreateTemplateParams struct {
-	UserID   int64          `json:"user_id"`
-	Name     sql.NullString `json:"name"`
-	Template sql.NullString `json:"template"`
-	Params   []string       `json:"params"`
+	UserID   int64    `json:"user_id"`
+	Name     string   `json:"name"`
+	Template string   `json:"template"`
+	Params   []string `json:"params"`
 }
 
 func (q *Queries) CreateTemplate(ctx context.Context, arg CreateTemplateParams) (Template, error) {
@@ -88,27 +87,43 @@ func (q *Queries) GetTemplateById(ctx context.Context, id int64) (Template, erro
 	return i, err
 }
 
-const getTemplateByName = `-- name: GetTemplateByName :one
-SELECT id, user_id, name, template, params, created_at FROM templates WHERE user_id = $1 AND name = $2
+const getTemplatesByName = `-- name: GetTemplatesByName :many
+SELECT id, user_id, name, template, params, created_at FROM templates WHERE user_id = $1 AND lower(name) LIKE $2
 `
 
-type GetTemplateByNameParams struct {
-	UserID int64          `json:"user_id"`
-	Name   sql.NullString `json:"name"`
+type GetTemplatesByNameParams struct {
+	UserID int64  `json:"user_id"`
+	Name   string `json:"name"`
 }
 
-func (q *Queries) GetTemplateByName(ctx context.Context, arg GetTemplateByNameParams) (Template, error) {
-	row := q.db.QueryRowContext(ctx, getTemplateByName, arg.UserID, arg.Name)
-	var i Template
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.Name,
-		&i.Template,
-		pq.Array(&i.Params),
-		&i.CreatedAt,
-	)
-	return i, err
+func (q *Queries) GetTemplatesByName(ctx context.Context, arg GetTemplatesByNameParams) ([]Template, error) {
+	rows, err := q.db.QueryContext(ctx, getTemplatesByName, arg.UserID, arg.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Template{}
+	for rows.Next() {
+		var i Template
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Template,
+			pq.Array(&i.Params),
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getTemplatesByUser = `-- name: GetTemplatesByUser :many
@@ -154,10 +169,10 @@ WHERE id = $1 RETURNING id, user_id, name, template, params, created_at
 `
 
 type UpdateTemplateByIdParams struct {
-	ID       int64          `json:"id"`
-	Name     sql.NullString `json:"name"`
-	Template sql.NullString `json:"template"`
-	Params   []string       `json:"params"`
+	ID       int64    `json:"id"`
+	Name     string   `json:"name"`
+	Template string   `json:"template"`
+	Params   []string `json:"params"`
 }
 
 func (q *Queries) UpdateTemplateById(ctx context.Context, arg UpdateTemplateByIdParams) (Template, error) {

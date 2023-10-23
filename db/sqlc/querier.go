@@ -13,7 +13,7 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteTemplateById(ctx context.Context, id int64) (Template, error)
 	GetTemplateById(ctx context.Context, id int64) (Template, error)
-	GetTemplateByName(ctx context.Context, arg GetTemplateByNameParams) (Template, error)
+	GetTemplatesByName(ctx context.Context, arg GetTemplatesByNameParams) ([]Template, error)
 	GetTemplatesByUser(ctx context.Context, userID int64) ([]Template, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)

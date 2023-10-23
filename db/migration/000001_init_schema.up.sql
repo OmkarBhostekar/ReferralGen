@@ -10,8 +10,8 @@ CREATE TABLE "users" (
 CREATE TABLE "templates" (
   "id" bigserial PRIMARY KEY,
   "user_id" bigserial NOT NULL,
-  "name" varchar,
-  "template" text,
+  "name" varchar NOT NULL,
+  "template" text NOT NULL,
   "params" varchar[],
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );

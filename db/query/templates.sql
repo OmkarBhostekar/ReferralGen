@@ -17,8 +17,8 @@ SELECT * FROM templates WHERE id = $1;
 -- name: GetTemplatesByUser :many
 SELECT * FROM templates WHERE user_id = $1;
 
--- name: GetTemplateByName :one
-SELECT * FROM templates WHERE user_id = $1 AND name = $2;
+-- name: GetTemplatesByName :many
+SELECT * FROM templates WHERE user_id = $1 AND lower(name) LIKE $2;
 
 -- name: DeleteTemplateById :one
 DELETE FROM templates WHERE id = $1 RETURNING *;

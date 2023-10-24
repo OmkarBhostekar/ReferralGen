@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -8,6 +9,7 @@ import (
 	db "example.com/referralgen/db/sqlc"
 	"example.com/referralgen/token"
 	"github.com/gin-gonic/gin"
+	openai "github.com/sashabaranov/go-openai"
 )
 
 type GenerateReferralTemplateRequest struct {
@@ -54,7 +56,7 @@ func (server *Server) GenerateReferralTemplate(ctx *gin.Context) {
 		return
 	}
 	// open ai call to generate template
-	template := OpenAICompletion(req.Prompt)
+	template, err := OpenAICompletion(req.Prompt, server.config.OpenAiToken)
 
 	// increase generation count for user
 	_, err = server.store.IncreaseGenerationCount(ctx, generations.ID)
@@ -67,7 +69,22 @@ func (server *Server) GenerateReferralTemplate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-func OpenAICompletion(prompt string) string {
-	// TODO: call open ai api to generate template
-	return "Hello, this is sample template for " + prompt
+func OpenAICompletion(prompt string, key string) (string, error) {
+	client := openai.NewClient(key)
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    openai.ChatMessageRoleUser,
+					Content: prompt,
+				},
+			},
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+	return resp.Choices[0].Message.Content, nil
 }

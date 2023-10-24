@@ -16,6 +16,17 @@ CREATE TABLE "templates" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
+CREATE TABLE "generations" (
+  "id" bigserial PRIMARY KEY,
+  "user_id" bigserial NOT NULL,
+  "created_date" varchar NOT NULL,
+  "count" int DEFAULT 0
+);
+
 CREATE INDEX ON "templates" ("name");
 
+CREATE INDEX ON "generations" ("created_date", "user_id");
+
 ALTER TABLE "templates" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "generations" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");

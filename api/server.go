@@ -45,6 +45,9 @@ func (server *Server) setupRouter() {
 	authRoutes.PATCH("/", server.UpdateTemplate)
 	authRoutes.GET("/search", server.GetTemplateByName)
 	authRoutes.DELETE("/:id", server.DeleteTemplateById)
+
+	authRoutes.POST("/generate", server.GenerateReferralTemplate)
+
 	server.router = router
 }
 

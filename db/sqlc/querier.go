@@ -9,14 +9,17 @@ import (
 )
 
 type Querier interface {
+	CreateGeneration(ctx context.Context, arg CreateGenerationParams) (Generation, error)
 	CreateTemplate(ctx context.Context, arg CreateTemplateParams) (Template, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteTemplateById(ctx context.Context, id int64) (Template, error)
 	GetTemplateById(ctx context.Context, id int64) (Template, error)
 	GetTemplatesByName(ctx context.Context, arg GetTemplatesByNameParams) ([]Template, error)
 	GetTemplatesByUser(ctx context.Context, userID int64) ([]Template, error)
+	GetTodayUserGenerationCount(ctx context.Context, arg GetTodayUserGenerationCountParams) (Generation, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
+	IncreaseGenerationCount(ctx context.Context, id int64) (Generation, error)
 	UpdateTemplateById(ctx context.Context, arg UpdateTemplateByIdParams) (Template, error)
 }
 

@@ -5,8 +5,16 @@
 package referralgen
 
 import (
+	"database/sql"
 	"time"
 )
+
+type Generation struct {
+	ID          int64         `json:"id"`
+	UserID      int64         `json:"user_id"`
+	CreatedDate string        `json:"created_date"`
+	Count       sql.NullInt32 `json:"count"`
+}
 
 type Template struct {
 	ID        int64     `json:"id"`

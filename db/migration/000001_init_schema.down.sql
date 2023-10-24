@@ -1,3 +1,4 @@
 
 DROP TABLE IF EXISTS templates;
+DROP TABLE IF EXISTS generations;
 DROP TABLE IF EXISTS users;
